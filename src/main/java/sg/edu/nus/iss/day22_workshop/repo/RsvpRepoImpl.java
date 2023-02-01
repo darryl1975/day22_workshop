@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.*;
+import java.sql.*;
 import java.util.*;
 import sg.edu.nus.iss.day22_workshop.model.RSVP;
 
@@ -66,4 +68,25 @@ public class RsvpRepoImpl {
                 return result;
         }
 
+        @Transactional
+        public int[] batchInsert(List<RSVP> rsvp) {
+                return jdbcTemplate.batchUpdate(insertSQL, (BatchPreparedStatementSetter) new BatchPreparedStatementSetter() {
+
+                        // rsvp.getFullName(), rsvp.getEmail(), rsvp.getPhone(),
+                        //        rsvp.getConfirmationDate(), rsvp.getComments()
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                                ps.setString(1, rsvp.get(i).getFullName());
+                                ps.setString(2,rsvp.get(i).getEmail());
+                                ps.setInt(3, rsvp.get(i).getPhone());
+                                ps.setDate(4, rsvp.get(i).getConfirmationDate());
+                                ps.setString(5, rsvp.get(i).getComments());
+                        }
+
+                        public int getBatchSize() {
+                                return rsvp.size();
+                        }
+
+
+                });
+        }
 }
