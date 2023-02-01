@@ -16,7 +16,7 @@ public class RsvpRepoImpl {
 
         private final String findAllSQL = "select * from rsvp";
 
-        private final String findByNameSQL = "select * from rsvp where full_name like '%?%'";
+        private final String findByNameSQL = "select * from rsvp where full_name like ?";
 
         private final String insertSQL = "insert into rsvp (full_name, email, phone, confirmation_date, comments) "
                         + "values (?, ?, ?, ?, ?)";
@@ -28,6 +28,12 @@ public class RsvpRepoImpl {
 
         private final String countSQL = "select count(*) as cnt from rsvp";
 
+        private final String findByIdSQL = "select * from rsvp where id = ?";
+
+        public RSVP findById(Integer id) {
+                return jdbcTemplate.queryForObject(findByIdSQL, BeanPropertyRowMapper.newInstance(RSVP.class), id);
+        }
+
         public List<RSVP> findAll() {
 
                 List<RSVP> resultList = new ArrayList<RSVP>();
@@ -37,8 +43,8 @@ public class RsvpRepoImpl {
 
         public List<RSVP> findByName(String name) {
                 List<RSVP> resultList = new ArrayList<RSVP>();
-                resultList = jdbcTemplate.query(findByNameSQL, new Object[] { name },
-                                BeanPropertyRowMapper.newInstance(RSVP.class));
+                resultList = jdbcTemplate.query(findByNameSQL,
+                                BeanPropertyRowMapper.newInstance(RSVP.class), name);
                 return resultList;
         }
 
